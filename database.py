@@ -11,20 +11,18 @@ class DataBase:
         # при инициализации бд создаем нужные таблицы
         self.create_table(
             'specialities',
-            id='INTEGER PRIMARY KEY',
+            id='INTEGER NOT NULL PRIMARY KEY',
             name='TEXT'
             )
 
         self.create_table(
             'doctors',
-            id='INTEGER PRIMARY KEY',
+            id='INTEGER NOT NULL PRIMARY KEY',
             name='TEXT',
-            speciality='TEXT', # тут будет FOREIGN KEY
+            speciality_id='INTEGER REFERENCES specialities(id)', # тут будет FOREIGN KEY
             address='TEXT',
             image='TEXT',
             )
-
-
 
     def create_table(self, table_name, **kwargs):
         # для использования метода передаем в качестве аргумента
@@ -34,15 +32,16 @@ class DataBase:
             self.cur.execute(f"CREATE TABLE IF NOT EXISTS {table_name}({rows})")
             logging.info(f'Таблица {table_name} создана или существует')
             return
-        except Exception:
-            logging.error(f"Не удалось создать таблицу{table_name}")
+        except Exception as ex:
+            logging.error(f"Не удалось создать таблицу {table_name}\nОшибка: {type(ex)} |{ex}|")
             return
 
     def delete_table(self, table_name):
         try:
             self.cur.execute(f'DROP TABLE IF EXISTS {table_name}')
-        except Exception:
-            logging.error(f"Не удалось удалить таблицу {table_name}, возможно она не существует")
+        except Exception as ex:
+            logging.error(f"""Не удалось удалить таблицу {table_name}, возможно она не существует\n
+            {type(ex)} |{ex}|""")
             return 
 
 db = DataBase()

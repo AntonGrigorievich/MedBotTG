@@ -1,4 +1,4 @@
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from config import ADMIN_ID
@@ -6,6 +6,8 @@ from config import ADMIN_ID
 from app import bot, dp
 from states import *
 from keyboards.reply import *
+from keyboards.inline import *
+from servises import *
 
 async def admin_startup(dp):
     await bot.send_message(chat_id=ADMIN_ID, text='Бот запущен')
@@ -39,66 +41,72 @@ async def start_self_diagnosis(message: Message):
     await message.answer("""
     Ответьте на несколько вопросов и мы предположим что с вами случилось.\n
     1/5) Какая у вас температура?
-    """, reply_markup=None)
+    """, reply_markup=TempKeyboard)
 
     await SelfDiagnosis.first()
 
-@dp.message_handler(state=SelfDiagnosis.nose_question)
-async def diagnosis_start(message: Message, state: FSMContext):
+@dp.callback_query_handler(symptom_callback.filter(symp_name='temp'), state=SelfDiagnosis.nose_question)
+async def diagnosis_start(call: CallbackData, callback_data: dict, state: FSMContext):
+    await call.answer()
     await state.update_data(
-        temp_status = message.text
+        temp_status = callback_data['symp_status']
     )
+    await call.message.edit_text('2/5) Вас беспокоят проблемы с носом?')
+    await call.message.edit_reply_markup(NoseKeyboard)
+    await SelfDiagnosis.next()
 
-    await message.answer("""
-    2/5) Вас беспокоят проблемы с носом?
-    """, reply_markup=None)
+@dp.callback_query_handler(symptom_callback.filter(symp_name='nose'), state=SelfDiagnosis.headache_question)
+async def diagnosis_start(call: CallbackData, callback_data: dict, state: FSMContext):
+    await call.answer()
+    await state.update_data(
+        nose_status = callback_data['symp_status']
+    )
+    await call.message.edit_text('3/5) У вас болит голова?')
+    await call.message.edit_reply_markup(HeadKeyboard)
 
     await SelfDiagnosis.next()
 
-@dp.message_handler(state=SelfDiagnosis.headache_question)
-async def diagnosis_start(message: Message, state: FSMContext):
+@dp.callback_query_handler(symptom_callback.filter(symp_name='head'), state=SelfDiagnosis.cough_question)
+async def diagnosis_start(call: CallbackData, callback_data: dict, state: FSMContext):
+    await call.answer()
     await state.update_data(
-        nose_status = message.text
+        head_status = callback_data['symp_status']
     )
-
-    await message.answer("""
-    3/5) У вас болит голова?
-    """, reply_markup=None)
-
+    await call.message.edit_text('4/5) Вас беспокоит кашель?')
+    await call.message.edit_reply_markup(CoughKeyboard)
+    
     await SelfDiagnosis.next()
 
-@dp.message_handler(state=SelfDiagnosis.cough_question)
-async def diagnosis_start(message: Message, state: FSMContext):
+@dp.callback_query_handler(symptom_callback.filter(symp_name='cough'), state=SelfDiagnosis.scrappiness_question)
+async def diagnosis_start(call: CallbackData, callback_data: dict, state: FSMContext):
+    await call.answer()
     await state.update_data(
-        headache_status = message.text
+        cough_status = callback_data['symp_status']
     )
-
-    await message.answer("""
-    4/5) Вас беспокоит кашель?
-    """, reply_markup=None)
-
+    await call.message.edit_text('5/5) Вы ощущаете ломоту?')
+    await call.message.edit_reply_markup(BodyKeyboard)
+    
     await SelfDiagnosis.next()
 
-@dp.message_handler(state=SelfDiagnosis.scrappiness_question)
-async def diagnosis_start(message: Message, state: FSMContext):
+@dp.callback_query_handler(symptom_callback.filter(symp_name='body'), state=SelfDiagnosis.final_state)
+async def diagnosis_start(call: CallbackData, callback_data: dict, state: FSMContext):
+    await call.answer()
     await state.update_data(
-        cough_status = message.text
+        body_status = callback_data['symp_status']
     )
+    res = ''
 
-    await message.answer("""
-    5/5) Вы ощущаете ломоту?
-    """, reply_markup=None)
+    async with state.proxy() as data:
+        print(detect_diagnosis(data.values()))
 
-    await SelfDiagnosis.next()
-
-@dp.message_handler(state=SelfDiagnosis.final_state)
-async def diagnosis_start(message: Message, state: FSMContext):
-    await state.update_data(
-        scrappiness_status = message.text
-    )
-
-    res = dp.storage
-
-    await message.answer(res, reply_markup=MenuKeyboard)
-
+    await call.message.edit_text('asdf')
+    await call.message.delete_reply_markup()
+    
     await state.reset_state()
+
+@dp.callback_query_handler(text='cancel', state='*')
+async def cancel_test(call: CallbackQuery, state: FSMContext):
+    await call.answer('Тест завершён')
+    await state.reset_state()
+    await call.message.delete_reply_markup()
+    await call.message.edit_text('Тест завершён')

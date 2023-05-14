@@ -11,7 +11,7 @@ class DataBase:
         # при инициализации бд создаем нужные таблицы
         self.create_table(
             'questions',
-            id='INTEGER NOT NULL PRIMARY KEY',
+            id='INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT',
             user_id='INTEGER',
             question_text='TEXT',
             )
@@ -47,9 +47,21 @@ class DataBase:
 
     def add_question(self, user_id, question):
         try:
-            self.cur.execute(f"INSERT INTO questions (id, user_id, question_text) VALUES (1, {user_id}, '{question}')")
+            self.cur.execute(f"INSERT INTO questions (user_id, question_text) VALUES ({user_id}, '{question}')")
             logging.info(f"""Вопрос {question} от пользователя {user_id} добавлен в базу данных""")
             self.db.commit()
         except Exception as ex:
             logging.error(f"""Не удалось добавить вопрос в базу данных.\n{type(ex)} |{ex}|""")
             return
+
+    def get_questions(self):
+        try:
+            self.cur.execute("SELECT user_id, question_text FROM questions")
+            questions = self.cur.fetchall()
+            return questions
+        except Exception as ex:
+            logging.error(f'Не удалось получить вопросы. Возможно их нет\n{type(ex)} |{ex}|')
+            return False
+
+db = DataBase()
+print(db.get_questions())

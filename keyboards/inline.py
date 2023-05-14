@@ -20,6 +20,17 @@ question_button_no = InlineKeyboardButton(
 QuestionConfirmKeyboard.insert(question_button_yes)
 QuestionConfirmKeyboard.insert(question_button_no)
 
+def create_support_keyboard(data):
+    # Создание клавиатуры для службы поддержки
+    support_admin_callback = CallbackData('admin_answer', 'text', 'user_id')
+    SupportAdminKeyboard = InlineKeyboardMarkup(row_width=1)
+    for id, text in data:
+        SupportAdminKeyboard.insert(InlineKeyboardButton(
+            text=text,
+            callback_data=support_admin_callback.new(text=f'{text}', user_id=f'{id}')
+            )
+        )
+    return SupportAdminKeyboard
 
 """Клавиатупры теста самодиагностики"""
 symptom_callback = CallbackData('symp', 'symp_name', 'symp_status')

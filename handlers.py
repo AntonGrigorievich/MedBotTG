@@ -1,7 +1,7 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
-from config import ADMIN_ID
+from config import ADMINS_ID
 
 from app import bot, dp, db
 from states import *
@@ -10,8 +10,22 @@ from keyboards.inline import *
 from servises import *
 
 
+"""Админские обработчики"""
 async def admin_startup(dp):
-    await bot.send_message(chat_id=ADMIN_ID, text='Бот запущен')
+    for id in ADMINS_ID:
+        await bot.send_message(chat_id=id, text='Бот запущен')
+
+@dp.message_handler(Command('user_questions'))
+async def get_user_questions(message: Message):
+    if message.from_id not in ADMINS_ID:
+        await message.answer(f'У вас нет доступа к этой команде.')
+    else:
+        questions_data = db.get_questions()
+        if questions_data:
+            kb = create_support_keyboard(questions_data)
+            await message.answer('Выберите вопрос, на который вы можете дать ответ', reply_markup=kb)
+        else:
+            await message.answer('В данный момент вопросов нет.')
 
 @dp.message_handler(Command('start'))
 async def show_menu(messge: Message):
@@ -63,13 +77,13 @@ async def confirm_support_question(message: Message, state: FSMContext):
 @dp.callback_query_handler(question_confirm_callback.filter(confirmation='True'), state=SupportQuestion.support_question_confirm)
 async def accept_question(call: CallbackData, state: FSMContext):
     await call.answer('Вопрос принят в обработку')
-    ### добавление запроса в бд
     async with state.proxy() as data:
-        print(data.as_dict(), '\n\n\n')
         user_id = data.as_dict()['user_id']
         question = data.as_dict()['question']
         db.add_question(user_id, question)
+
     await state.finish()
+
     await call.message.edit_text('Ваш вопрос принят в обработку')
     await call.message.edit_reply_markup()
 

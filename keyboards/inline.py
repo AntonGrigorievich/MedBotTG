@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 """Клавиатуры для службы поддержки"""
-question_confirm_callback = CallbackData('questioin', 'confirmation')
+question_confirm_callback = CallbackData('question', 'confirmation')
 
 QuestionConfirmKeyboard = InlineKeyboardMarkup()
 
@@ -20,17 +20,21 @@ question_button_no = InlineKeyboardButton(
 QuestionConfirmKeyboard.insert(question_button_yes)
 QuestionConfirmKeyboard.insert(question_button_no)
 
-def create_support_keyboard(data):
-    # Создание клавиатуры для службы поддержки
-    support_admin_callback = CallbackData('admin_answer', 'text', 'user_id')
-    SupportAdminKeyboard = InlineKeyboardMarkup(row_width=1)
-    for id, text in data:
-        SupportAdminKeyboard.insert(InlineKeyboardButton(
-            text=text,
-            callback_data=support_admin_callback.new(text=f'{text}', user_id=f'{id}')
-            )
-        )
-    return SupportAdminKeyboard
+question_action_callback = CallbackData('admin_select', 'action')
+
+QuestionActionSelectKeyboard = InlineKeyboardMarkup()
+
+admin_question_answer = InlineKeyboardButton(
+    text='Ответить',
+    callback_data=question_action_callback.new(action='answer')
+)
+admin_question_delete = InlineKeyboardButton(
+    text='Удалить',
+    callback_data=question_action_callback.new(action='delete')
+)
+QuestionActionSelectKeyboard.insert(admin_question_answer)
+QuestionActionSelectKeyboard.insert(admin_question_delete)
+
 
 """Клавиатупры теста самодиагностики"""
 symptom_callback = CallbackData('symp', 'symp_name', 'symp_status')

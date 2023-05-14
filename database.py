@@ -48,20 +48,35 @@ class DataBase:
     def add_question(self, user_id, question):
         try:
             self.cur.execute(f"INSERT INTO questions (user_id, question_text) VALUES ({user_id}, '{question}')")
-            logging.info(f"""Вопрос {question} от пользователя {user_id} добавлен в базу данных""")
             self.db.commit()
+            logging.info(f"""Вопрос {question} от пользователя {user_id} добавлен в базу данных""")
         except Exception as ex:
             logging.error(f"""Не удалось добавить вопрос в базу данных.\n{type(ex)} |{ex}|""")
             return
 
+    def delete_question(self, id):
+        try:
+            self.cur.execute(f"DELETE FROM questions WHERE id={id}")
+            self.db.commit()
+            logging.info(f"""Вопрос номер {id} был удален из базы данных""")
+        except Exception as ex:
+            logging.error(f"""Не удалось удалить вопрос. Возможно он не существует.\n{type(ex)} |{ex}|""")
+            return 
+
+    def get_question(self, id):
+        try:
+            self.cur.execute(f"SELECT id, user_id, question_text FROM questions WHERE id={id}")
+            question = self.cur.fetchone()
+            return question
+        except Exception as ex:
+            logging.error(f'Не удалось получить вопрос. Возможно их нет\n{type(ex)} |{ex}|')
+            return
+
     def get_questions(self):
         try:
-            self.cur.execute("SELECT user_id, question_text FROM questions")
+            self.cur.execute("SELECT id, user_id, question_text FROM questions LIMIT 6")
             questions = self.cur.fetchall()
             return questions
         except Exception as ex:
             logging.error(f'Не удалось получить вопросы. Возможно их нет\n{type(ex)} |{ex}|')
             return False
-
-db = DataBase()
-print(db.get_questions())

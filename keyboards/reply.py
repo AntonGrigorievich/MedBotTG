@@ -15,3 +15,13 @@ MenuKeyboard = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
+
+AdminMenuKeyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton('/user_questions'),
+            KeyboardButton(text='Пользовательское меню'),
+        ]
+    ],
+    resize_keyboard=True
+)

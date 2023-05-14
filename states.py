@@ -10,3 +10,9 @@ class SelfDiagnosis(StatesGroup):
 class SupportQuestion(StatesGroup):
     support_question = State()
     support_question_confirm = State()
+
+class SupportAnswer(StatesGroup):
+    question_action_select = State()
+    action_execute = State()
+    answer_get = State()
+    answer_confirm = State()

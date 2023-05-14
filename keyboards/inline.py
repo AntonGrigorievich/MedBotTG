@@ -24,7 +24,7 @@ temp_button2 = InlineKeyboardButton(
     callback_data=symptom_callback.new(symp_name='temp', symp_status='36.6')
 )
 temp_button3 = InlineKeyboardButton(
-    text='Больще 36.6',
+    text='Больше 36.6',
     callback_data=symptom_callback.new(symp_name='temp', symp_status='>36.6')
 )
 
@@ -42,7 +42,7 @@ nose_button1 = InlineKeyboardButton(
 )
 nose_button2 = InlineKeyboardButton(
     text='Проблем нет',
-    callback_data=symptom_callback.new(symp_name='nose', symp_status='normal')
+    callback_data=symptom_callback.new(symp_name='nose', symp_status='normal_nose')
 )
 nose_button3 = InlineKeyboardButton(
     text='Насморк',
@@ -63,7 +63,7 @@ head_button1 = InlineKeyboardButton(
 )
 head_button2 = InlineKeyboardButton(
     text='Проблем нет',
-    callback_data=symptom_callback.new(symp_name='head', symp_status='normal')
+    callback_data=symptom_callback.new(symp_name='head', symp_status='normal_head')
 )
 head_button3 = InlineKeyboardButton(
     text='Давление (напряжение головы)',
@@ -84,7 +84,7 @@ cough_button1 = InlineKeyboardButton(
 )
 cough_button2 = InlineKeyboardButton(
     text='Проблем нет',
-    callback_data=symptom_callback.new(symp_name='cough', symp_status='normal')
+    callback_data=symptom_callback.new(symp_name='cough', symp_status='no_cough')
 )
 cough_button3 = InlineKeyboardButton(
     text='Влажный кашель',
@@ -105,7 +105,7 @@ body_button1 = InlineKeyboardButton(
 )
 body_button2 = InlineKeyboardButton(
     text='Проблем нет',
-    callback_data=symptom_callback.new(symp_name='body', symp_status='normal')
+    callback_data=symptom_callback.new(symp_name='body', symp_status='normal_body')
 )
 BodyKeyboard.insert(body_button1)
 BodyKeyboard.insert(body_button2)

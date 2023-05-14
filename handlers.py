@@ -3,7 +3,7 @@ from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from config import ADMIN_ID
 
-from app import bot, dp
+from app import bot, dp, db
 from states import *
 from keyboards.reply import *
 from keyboards.inline import *
@@ -19,7 +19,7 @@ async def show_menu(messge: Message):
 
 
 """ Обработчики кнопок основного меню """
-@dp.message_handler(text='📍 Помощь')
+@dp.message_handler(text='📍 Помощь', state='*')
 async def bot_help(message: Message):
     await message.answer("""
 Данный обладает следующим функционалом:\n
@@ -30,7 +30,7 @@ async def bot_help(message: Message):
     • ☎ Обратиться в поддержку - Данная кнопка позволяет обратиться за помощью к реальному человеку (медленно но верно).\n
     """)
 
-@dp.message_handler(text='📋 Записаться к врачу')
+@dp.message_handler(text='📋 Записаться к врачу', state='*')
 async def make_appointment(message: Message):
     await message.answer("""
     Записаться на приём к врачу можно через Госуслуги, лично и по телефону.\n
@@ -40,9 +40,49 @@ async def make_appointment(message: Message):
     )
 
 @dp.message_handler(text='☎ Обратиться в поддержку')
-async def ask_support(message: Message):
-    await message.answer("Задайте ваш вопрос в текстовом сообщении")
+async def start_support_state(message: Message):
+    await message.answer("Задайте ваш вопрос в текстовом сообщении", reply_markup=None)
 
+    await SupportQuestion.first()
+
+@dp.message_handler(state=SupportQuestion.support_question)
+async def confirm_support_question(message: Message, state: FSMContext):
+    await state.update_data(
+        user_id = message.from_id,
+        question = message.text
+    )
+
+    await message.answer(
+        text=f"""Ваш вопрос: {message.text}\n
+Вы уверены что хотите отправить его в службу поддержки?""",
+        reply_markup=QuestionConfirmKeyboard)
+    
+    await SupportQuestion.next()
+
+
+@dp.callback_query_handler(question_confirm_callback.filter(confirmation='True'), state=SupportQuestion.support_question_confirm)
+async def accept_question(call: CallbackData, state: FSMContext):
+    await call.answer('Вопрос принят в обработку')
+    ### добавление запроса в бд
+    async with state.proxy() as data:
+        print(data.as_dict(), '\n\n\n')
+        user_id = data.as_dict()['user_id']
+        question = data.as_dict()['question']
+        db.add_question(user_id, question)
+    await state.finish()
+    await call.message.edit_text('Ваш вопрос принят в обработку')
+    await call.message.edit_reply_markup()
+
+@dp.callback_query_handler(question_confirm_callback.filter(confirmation='False'), state=SupportQuestion.support_question_confirm)
+async def accept_question(call: CallbackData, state: FSMContext):
+    await call.answer('Отмена отправления вопроса')
+
+    await state.finish()
+
+    await call.message.edit_text('Отправление вопроса отменено')
+    await call.message.delete_reply_markup()
+
+""" Обработчики кнопок теста самодиагностики """
 @dp.message_handler(text='❤Симптомы')
 async def start_self_diagnosis(message: Message):
     await message.answer("""
@@ -52,8 +92,6 @@ async def start_self_diagnosis(message: Message):
 
     await SelfDiagnosis.first()
 
-
-""" Обработчики кнопок теста самодиагностики """
 @dp.callback_query_handler(symptom_callback.filter(symp_name='temp'), state=SelfDiagnosis.nose_question)
 async def diagnosis_question_nose(call: CallbackData, callback_data: dict, state: FSMContext):
     await call.answer()

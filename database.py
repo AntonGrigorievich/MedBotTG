@@ -10,9 +10,10 @@ class DataBase:
         
         # при инициализации бд создаем нужные таблицы
         self.create_table(
-            'specialities',
+            'questions',
             id='INTEGER NOT NULL PRIMARY KEY',
-            name='TEXT'
+            user_id='INTEGER',
+            question_text='TEXT',
             )
 
         self.create_table(
@@ -44,4 +45,11 @@ class DataBase:
             {type(ex)} |{ex}|""")
             return 
 
-db = DataBase()
+    def add_question(self, user_id, question):
+        try:
+            self.cur.execute(f"INSERT INTO questions (id, user_id, question_text) VALUES (1, {user_id}, '{question}')")
+            logging.info(f"""Вопрос {question} от пользователя {user_id} добавлен в базу данных""")
+            self.db.commit()
+        except Exception as ex:
+            logging.error(f"""Не удалось добавить вопрос в базу данных.\n{type(ex)} |{ex}|""")
+            return

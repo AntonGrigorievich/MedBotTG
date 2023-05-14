@@ -2,10 +2,30 @@ from aiogram.utils.callback_data import CallbackData
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
+"""Клавиатуры для службы поддержки"""
+question_confirm_callback = CallbackData('questioin', 'confirmation')
+
+QuestionConfirmKeyboard = InlineKeyboardMarkup()
+
+question_button_yes = InlineKeyboardButton(
+    text='Да',
+    callback_data=question_confirm_callback.new(confirmation='True')
+)
+
+question_button_no = InlineKeyboardButton(
+    text='Нет',
+    callback_data=question_confirm_callback.new(confirmation='False')
+)
+
+QuestionConfirmKeyboard.insert(question_button_yes)
+QuestionConfirmKeyboard.insert(question_button_no)
+
+
+"""Клавиатупры теста самодиагностики"""
 symptom_callback = CallbackData('symp', 'symp_name', 'symp_status')
 cancel_callback = CallbackData('cancel', 'status')
 
-#данныя кнопка будет использоваться для завершения теста на любой его стадии
+#данныя кнопка будет использоваться для завершения теста самодиагностики на любой его стадии
 cancel_button = InlineKeyboardButton(
     text='Закончить тест',
     callback_data='cancel'

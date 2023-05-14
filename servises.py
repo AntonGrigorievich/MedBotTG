@@ -16,7 +16,7 @@ def detect_diagnosis(data):
     elif ('scrappy' in data) and ('pressure' in data):
         res +='• растяжение мышц шеи'
 
-    if res == 'Возможные диагнозы: ':
+    if res == 'Возможные диагнозы:\n':
         res = 'Не удалось определить диагноз\n'
     
     res += """

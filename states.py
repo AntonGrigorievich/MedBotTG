@@ -6,3 +6,7 @@ class SelfDiagnosis(StatesGroup):
     cough_question = State()
     scrappiness_question = State()
     final_state = State()
+
+class SupportQuestion(StatesGroup):
+    support_question = State()
+    support_question_confirm = State()

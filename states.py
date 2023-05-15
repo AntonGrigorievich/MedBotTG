@@ -16,3 +16,6 @@ class SupportAnswer(StatesGroup):
     action_execute = State()
     answer_get = State()
     answer_confirm = State()
+
+class KeywordsAnswer(StatesGroup):
+    get_question = State()

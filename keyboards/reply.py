@@ -8,7 +8,6 @@ MenuKeyboard = ReplyKeyboardMarkup(
             KeyboardButton(text='❔ Задать вопрос'),
         ],
         [
-            KeyboardButton(text='ℹ︎ Информация'),
             KeyboardButton(text='☎ Обратиться в поддержку'),
             KeyboardButton(text='📍 Помощь'),
         ]

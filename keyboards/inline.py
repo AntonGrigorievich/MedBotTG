@@ -8,12 +8,12 @@ question_confirm_callback = CallbackData('question', 'confirmation')
 QuestionConfirmKeyboard = InlineKeyboardMarkup()
 
 question_button_yes = InlineKeyboardButton(
-    text='Да',
+    text='Да ✅',
     callback_data=question_confirm_callback.new(confirmation='True')
 )
 
 question_button_no = InlineKeyboardButton(
-    text='Нет',
+    text='Нет ❌',
     callback_data=question_confirm_callback.new(confirmation='False')
 )
 
@@ -25,11 +25,11 @@ question_action_callback = CallbackData('admin_select', 'action')
 QuestionActionSelectKeyboard = InlineKeyboardMarkup()
 
 admin_question_answer = InlineKeyboardButton(
-    text='Ответить',
+    text='Ответить 🗣️',
     callback_data=question_action_callback.new(action='answer')
 )
 admin_question_delete = InlineKeyboardButton(
-    text='Удалить',
+    text='Удалить ❌',
     callback_data=question_action_callback.new(action='delete')
 )
 QuestionActionSelectKeyboard.insert(admin_question_answer)
@@ -42,7 +42,7 @@ cancel_callback = CallbackData('cancel', 'status')
 
 #данныя кнопка будет использоваться для завершения теста самодиагностики на любой его стадии
 cancel_button = InlineKeyboardButton(
-    text='Закончить тест',
+    text='Закончить тест 🚪',
     callback_data='cancel'
 )
 

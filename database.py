@@ -16,15 +16,6 @@ class DataBase:
             question_text='TEXT',
             )
 
-        self.create_table(
-            'doctors',
-            id='INTEGER NOT NULL PRIMARY KEY',
-            name='TEXT',
-            speciality_id='INTEGER REFERENCES specialities(id)', # тут будет FOREIGN KEY
-            address='TEXT',
-            image='TEXT',
-            )
-
     def create_table(self, table_name, **kwargs):
         # для использования метода передаем в качестве аргумента
         # название таблицы и ее столбцы в формате ключевых аргументов
